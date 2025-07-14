@@ -89,7 +89,10 @@ function Login() {
               </label>
             </div>
             <Link to={"/register"}>
-              <button className="pt-3 cursor-pointer text-[var(--gray-3)] text-[.85rem] lg:text-[.9vw] transiction-all duration-[.3s] ease-in-out hover:text-[var(--gray-2)]">
+              <button
+                type="button"
+                className="pt-3 cursor-pointer text-[var(--gray-3)] text-[.85rem] lg:text-[.9vw] transiction-all duration-[.3s] ease-in-out hover:text-[var(--gray-2)]"
+              >
                 Novo por aqui? Crie uma conta!
               </button>
             </Link>
@@ -100,7 +103,7 @@ function Login() {
             <input
               type="submit"
               value="Entrar"
-              className="mt-6 cursor-pointer p-2 block  border-[var(--gray-1)] rounded-[.4rem] bg bg-[var(--gray-1)] text-[var(--white)] w-full transiction-all duration-[.3s] ease-in-outlg:rounded-[.5vw] lg:p-[.5vw] lg:mt-[1.5vw]  hover:bg-[var(--gray-2)] "
+              className="mt-6 cursor-pointer p-2 block  border-[var(--gray-1)] rounded-[.4rem] bg bg-[var(--gray-1)] text-[var(--white)] w-full transiction-all duration-[.3s] ease-in-out lg:rounded-[.5vw] lg:p-[.5vw] lg:mt-[1.5vw]  hover:bg-[var(--gray-2)] "
             />
           </form>
         </div>
