@@ -67,23 +67,23 @@ function Register() {
   };
 
   return (
-    <div className="flex items-center justify-between">
-      <div className="flex flex-col items-center justify-center lg:w-[50vw] lg:gap-[2vw] ">
-        <div className="flex items-end justify-between lg:gap-[2vw]">
+    <div className="flex flex-col-reverse items-center justify-between lg:flex-row">
+      <div className="shadow-lg bg-[var(--white)] absolute top-[20vh] p-6 rounded-[.4rem] flex flex-col items-center justify-center lg:w-[50vw] lg:gap-[2vw] lg:m-0 lg:shadow-none lg:bg-transparent lg:p-0 lg:translate-y-0 lg:relative lg:top-0">
+        <div className="mt-5 flex items-center justify-between gap-4 lg:gap-[2vw] ">
           <Link to={"/"}>
             <img
               src={logo}
               alt="daily diet logo"
-              className="object-cover h-full lg:w-[15vw] pointer-events-none select-none"
+              className="object-cover w-[4rem] h-full pointer-events-none select-none lg:w-[15vw] "
             />
           </Link>
           <div>
-            <h1 className="lg:text-[2vw] font-bold lg:w-[13vw] lg:leading-[2vw]">
+            <h1 className="font-bold w-[10rem] leading-4 lg:w-[14vw] lg:leading-[2vw] lg:text-[2vw]">
               Crie sua conta!
             </h1>
           </div>
         </div>
-        <div className="w-full lg:px-[11vw]">
+        <div className="mt-5 w-full lg:px-[11vw] lg:m-0">
           <form className="flex items-start flex-col " onSubmit={handleSubmit}>
             <div className="flex items-start flex-col gap-4 lg:gap-[1vw] w-full">
               <label htmlFor="name" className="text-[var(--gray-2)] w-full">

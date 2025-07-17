@@ -63,4 +63,20 @@ export async function mealsRoutes(app: FastifyInstance) {
       }
     }
   );
+
+  // listar refeições
+  app.get(
+    "/meals",
+    { preHandler: [checkSessionIdExists] },
+    async (req, rep) => {
+      const user = req.user;
+
+      if (!user)
+        return rep.status(401).send({ message: "O usuário não existe." });
+
+      const userMeals = await knex("meals").where({ user_id: user.id });
+
+      return rep.status(200).send(userMeals);
+    }
+  );
 }

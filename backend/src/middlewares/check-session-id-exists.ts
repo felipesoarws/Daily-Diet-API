@@ -9,6 +9,13 @@ declare module "fastify" {
       name: string;
       email: string;
     };
+
+    userMeals?: {
+      name: string;
+      description: string;
+      date: string;
+      hour: string;
+    };
   }
 }
 
