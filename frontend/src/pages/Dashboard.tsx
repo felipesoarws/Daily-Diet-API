@@ -4,6 +4,8 @@ import { Link, useNavigate } from "react-router-dom";
 import "../styles/index.css";
 
 import logo from "../assets/logo.webp";
+import isOnDietIcon from "../assets/isOnDietIcon.webp";
+import isNotOnDietIcon from "../assets/isNotOnDietIcon.webp";
 
 import {
   XIcon,
@@ -34,14 +36,34 @@ function Dashboard() {
   const [mealDesc, setMealDesc] = useState<string>("");
   const [mealDate, setMealDate] = useState<string>("");
   const [mealHour, setMealHour] = useState<string>("");
-  const [mealIsOnDiet, setMealIsOnDiet] = useState<boolean>(true);
+  const [mealIsOnDiet, setMealIsOnDiet] = useState<boolean>();
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [isOpenProfileMenu, setIsOpenProfileMenu] = useState<boolean>(false);
-  const [isOpenNewMealMenu, setIsOpenNewMealMenu] = useState<boolean>(false);
+  const [isOpenNewMealModalMenu, setIsOpenNewMealModalMenu] =
+    useState<boolean>(false);
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [isMealRegistered, setIsMealRegistered] = useState<boolean>(false);
+
   const navigate = useNavigate();
+
+  useEffect(() => {
+    if (isOpenNewMealModalMenu || isMealRegistered) {
+      document.body.classList.add("no-scroll");
+    } else {
+      document.body.classList.remove("no-scroll");
+    }
+
+    return () => {
+      document.body.classList.remove("no-scroll");
+    };
+  }, [isOpenNewMealModalMenu, isMealRegistered]);
+
+  useEffect(() => {
+    const calculatedPercentage = howManyMealsIsOnDiet();
+    setMealsPercent(Number(calculatedPercentage));
+  }, [meals]);
 
   // recuperar dados das refeições
   const fetchMealsData = async () => {
@@ -102,23 +124,6 @@ function Dashboard() {
     const percentage = (mealsOnDiet / meals.length) * 100;
     return Number(percentage);
   };
-
-  useEffect(() => {
-    if (isOpenNewMealMenu) {
-      document.body.classList.add("no-scroll");
-    } else {
-      document.body.classList.remove("no-scroll");
-    }
-
-    return () => {
-      document.body.classList.remove("no-scroll");
-    };
-  }, [isOpenNewMealMenu]);
-
-  useEffect(() => {
-    const calculatedPercentage = howManyMealsIsOnDiet();
-    setMealsPercent(Number(calculatedPercentage));
-  }, [meals]);
 
   useEffect(() => {
     // recuperar dados do usuário
@@ -226,8 +231,10 @@ function Dashboard() {
 
       if (response.ok) {
         // subir modal de aviso de registro
-        setIsOpenNewMealMenu(false);
-        cleanMealFields();
+        setIsMealRegistered(true);
+
+        setIsOpenNewMealModalMenu(false);
+
         await fetchMealsData();
       } else {
         const errorData = await response.json(); // Tenta ler a mensagem de erro do backend
@@ -255,7 +262,8 @@ function Dashboard() {
 
   // abrir refeição detalhada
   const detailedMeal = (meal: Meal) => {
-    /*   console.log(meal); */
+    if (!meal)
+      return console.error("Erro em selecionar uma refeição. Tente novamente.");
 
     navigate("/dashboard/details", { state: { mealDetails: meal } });
   };
@@ -292,8 +300,9 @@ function Dashboard() {
           text-[var(--white)]  transiction-all duration-[.3s] ease-in-out
           lg:rounded-[.5vw] lg:p-[.6vw] lg:px-[1.5vw] hover:bg-[var(--gray-2)] lg:flex"
               onClick={() => {
+                cleanMealFields();
                 setErrorMessage("");
-                setIsOpenNewMealMenu(true);
+                setIsOpenNewMealModalMenu(true);
                 setIsOpenProfileMenu(false);
               }}
             >
@@ -336,7 +345,7 @@ function Dashboard() {
         )}
       </header>
       <AnimatePresence mode="wait">
-        {isOpenNewMealMenu && (
+        {isOpenNewMealModalMenu && (
           <motion.div
             className="bg-[#000000a2] absolute top-0 left-0 right-0 bottom-0"
             initial={{ opacity: 0 }}
@@ -351,7 +360,7 @@ function Dashboard() {
               transition={{ duration: 0.3 }}
               className="flex items-center justify-center"
             >
-              <div className="p-4 z-999 bg-[var(--white)] mt-12 rounded-[.8rem] border border-[var(--gray-4)]  lg:w-[30vw] lg:p-[2vw] lg:mt-[3vw] lg:rounded-[.8vw]">
+              <div className="p-5 z-999 bg-[var(--white)] mt-12 rounded-[.8rem] border border-[var(--gray-4)]  lg:w-[30vw] lg:p-[2vw] lg:mt-[3vw] lg:rounded-[.8vw]">
                 <div className="flex items-center justify-between">
                   <h3 className="text-[1.2rem] font-medium lg:text-[1.4vw]">
                     Nova refeição
@@ -360,7 +369,7 @@ function Dashboard() {
                   <button
                     type="button"
                     className="cursor-pointer"
-                    onClick={() => setIsOpenNewMealMenu(false)}
+                    onClick={() => setIsOpenNewMealModalMenu(false)}
                   >
                     <XIcon size={30} weight="bold" />
                   </button>
@@ -510,6 +519,88 @@ function Dashboard() {
           </motion.div>
         )}
       </AnimatePresence>
+      <AnimatePresence mode="wait">
+        {isMealRegistered && (
+          <div className="bg-[#000000a2] absolute top-0 left-0 right-0 bottom-0">
+            {mealIsOnDiet ? (
+              <motion.div
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -30 }}
+                transition={{ duration: 0.3 }}
+                className="flex items-center justify-center"
+              >
+                <div className="p-8 z-999 bg-[var(--white)] mt-12 rounded-[.8rem] w-[17rem] border border-[var(--gray-4)]  lg:w-[26vw] lg:p-[2vw] lg:mt-[3vw] lg:rounded-[.8vw]">
+                  <div className="flex items-center justify-center flex-col text-center">
+                    <h3 className="font-bold text-[1.2rem] text-[var(--green-dark)] lg:text-[1.4vw]">
+                      Continue assim!
+                    </h3>
+                    <p>
+                      Você continua <strong>dentro da dieta</strong>. Muito bem!
+                    </p>
+                    <img
+                      src={isOnDietIcon}
+                      alt="woman happy icon"
+                      className="w-[10rem] mt-4 lg:w-[15vw] object-cover"
+                    />
+                    <div
+                      className="mt-4 p-2 cursor-pointer  rounded-[.4rem] bg-[var(--gray-1)]
+          text-[var(--white)]  transiction-all duration-[.3s] ease-in-out
+          lg:rounded-[.5vw] lg:p-[.6vw] lg:px-[1.5vw] hover:bg-[var(--gray-2)] "
+                      onClick={() => {
+                        setIsOpenNewMealModalMenu(false);
+                        setIsMealRegistered(false);
+                      }}
+                    >
+                      <button className="text-[.9rem] cursor-pointer lg:text-[1vw]">
+                        Ir para página inicial
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </motion.div>
+            ) : (
+              <motion.div
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -30 }}
+                transition={{ duration: 0.3 }}
+                className="flex items-center justify-center"
+              >
+                <div className="p-8 z-999 bg-[var(--white)] mt-12 rounded-[.8rem] w-[17rem] border border-[var(--gray-4)]  lg:w-[26vw] lg:p-[2vw] lg:mt-[3vw] lg:rounded-[.8vw]">
+                  <div className="flex items-center justify-center flex-col text-center">
+                    <h3 className="font-bold text-[1.2rem] text-[var(--red-dark)] lg:text-[1.4vw]">
+                      Que pena!
+                    </h3>
+                    <p>
+                      Você <strong>saiu da dieta</strong> dessa vez, mas
+                      continue se esforçando e não desista!
+                    </p>
+                    <img
+                      src={isNotOnDietIcon}
+                      alt="woman happy icon"
+                      className="w-[10rem] mt-4 lg:w-[15vw] object-cover"
+                    />
+                    <div
+                      className="mt-4 p-2 cursor-pointer  rounded-[.4rem] bg-[var(--gray-1)]
+          text-[var(--white)]  transiction-all duration-[.3s] ease-in-out
+          lg:rounded-[.5vw] lg:p-[.6vw] lg:px-[1.5vw] hover:bg-[var(--gray-2)] "
+                      onClick={() => {
+                        setIsOpenNewMealModalMenu(false);
+                        setIsMealRegistered(false);
+                      }}
+                    >
+                      <button className="text-[.9rem] cursor-pointer lg:text-[1vw]">
+                        Ir para página inicial
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </motion.div>
+            )}
+          </div>
+        )}
+      </AnimatePresence>
       <div className="mt-5 flex flex-col-reverse items-start justify-center gap-4 lg:gap-[5vw] lg:mt-[2.5vw] lg:flex-row">
         <div className="w-full lg:w-[50vw]">
           <h2 className="text-[1.1rem] font-bold lg:text-[2.5vw]">Refeições</h2>
@@ -519,7 +610,7 @@ function Dashboard() {
        hover:bg-[var(--gray-2)] lg:hidden"
             onClick={() => {
               setErrorMessage("");
-              setIsOpenNewMealMenu(true);
+              setIsOpenNewMealModalMenu(true);
               setIsOpenProfileMenu(false);
             }}
           >
@@ -590,7 +681,7 @@ function Dashboard() {
               </Link>
             </div>
           ) : (
-            <div className="-z-100 relative bg-[var(--red-mid)] rounded-[.8rem] flex flex-col items-center justify-center lg:w-full lg:leading-[2.8vw] lg:py-[1.5vw] lg:pt-[3vw] lg:rounded-[.8vw]">
+            <div className="-z-1 w-full p-4 pt-7 relative leading-7 bg-[var(--red-mid)] rounded-[.5rem] flex flex-col items-center justify-center lg:leading-[2.8vw] lg:py-[1.5vw] lg:pt-[3vw] lg:rounded-[.8vw]">
               {!mealsPercent ? (
                 <h2 className="text-[var(--gray-1)] text-[2rem] font-extrabold lg:text-[4vw]">
                   Carregando...
